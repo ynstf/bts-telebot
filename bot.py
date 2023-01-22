@@ -51,8 +51,6 @@ def reply(message):
         return bot.reply_to(message,"- S1\n- Interviews")
     if words[0].lower() == "s1" :
         return bot.reply_to(message,s1),bot.reply_to(message,"mention the subject to see their resources!")
-    if words[0].lower() == "s1" :
-        return bot.reply_to(message,"mention the subject to see their resources !")
     
     if words[0].lower() in inters :
         return bot.reply_to(message,interview1),bot.reply_to(message,interview2),bot.reply_to(message,interview3),bot.reply_to(message,interview4),bot.reply_to(message,interview5),bot.reply_to(message,interview6),bot.reply_to(message,interview7),bot.reply_to(message,interview8),bot.reply_to(message,interview9), bot.reply_to(message,"Interviews : https://www.udrop.com/7Kx4/ML.rar") 
@@ -63,7 +61,7 @@ def reply(message):
     if words[0].lower() == "databases":
         return bot.reply_to(message,"DataBases : https://www.udrop.com/7KwV/BDR.rar")
     if words[0].lower() == "Math":
-        return bot.reply_to(message,"Math : https://www.udrop.com/7KwW/1_math.rar")        
+        return bot.reply_to(message,"math : https://www.udrop.com/7KwW/1_math.rar")        
     if words[0].lower() == "applied":
         return bot.reply_to(message,"Applied mathematics : https://www.udrop.com/7Kx0/MIA.rar")
     if words[0].lower() == "python":
