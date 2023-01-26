@@ -8,7 +8,7 @@
 
 import telebot
 from telebot import types,util
-from msgs import *
+from msgs import interview1,interview2,interview3,interview4,interview5,interview6,interview7,interview8,interview9,hlp,hi,info,infos,s1,ecole,kindy,subjects,coor,coordinator,creator,creators,inters,me, ocv, exmp, cv_w, w_cv, cvs,cv_menu
 from decouple import config
 from gtts import gTTS
 import os
@@ -144,7 +144,7 @@ def reply(message):
     if words[0].lower() in ["say","قل","dire"] :
 
         if words[0].lower() in ["say","dire"] :
-            if words[-1].lower() in ["ar","arabic","arabia","arabie","العربية","fr","frensh","francais","français","en","english","anglais","eng"]:
+            if words[-1].lower() in ["ar","arabic","arabia","arabie","بالعربية","fr","frensh","francais","français","en","english","anglais","eng"]:
                 text = words[1:-2]
             else:
                 text = words[1:]
@@ -155,7 +155,10 @@ def reply(message):
                 txt += ele
                 txt += " "
         if words[0].lower() == "قل" :
-            text = words[1:-1]
+            if words[-1].lower() in ["ar","arabic","arabia","arabie","بالعربية","fr","frensh","francais","français","en","english","anglais","eng"]:
+                text = words[1:-1]
+            else :
+                text = words[1:]
             # initialize an empty string
             txt = ""
             # traverse in the string
@@ -167,7 +170,7 @@ def reply(message):
             lng = "en"
         elif words[-1].lower() in ["fr","frensh","francais","français"]:
             lng = "fr"
-        elif words[-1].lower() in ["ar","arabic","arabia","arabie","العربية"]:
+        elif words[-1].lower() in ["ar","arabic","arabia","arabie","بالعربية"]:
             lng = "ar"
         else :
             lng = "ar"
@@ -176,6 +179,7 @@ def reply(message):
         spesh.save("audio.mp3")
 
         return bot.send_audio(message.chat.id, audio=open('audio.mp3', 'rb')),os.remove('audio.mp3')
+
 
 
     else:
