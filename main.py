@@ -1,4 +1,4 @@
-###requirements:
+###requirements
 #python 3.6
 #cv2 4.0.0.21
 #mediapipe 0.8.3
@@ -10,6 +10,7 @@ import telebot
 from telebot import types,util
 from msgs import *
 from decouple import config
+from gtts import gTTS
 import os
 import cv2
 import HandTrackingModule as htm
@@ -45,6 +46,8 @@ def handleUserUpdates(message:types.ChatMemberUpdated):
 # answering every message not just commands
 def isMSg(message):
     return True
+
+
 @bot.message_handler(content_types=['photo'])
 def photo(message):
     fileID = message.photo[-1].file_id
@@ -67,11 +70,14 @@ def photo(message):
     os.remove('image.jpg')
 
 
+
+whoAreYou = ["who" , "what" ]
+
 @bot.message_handler(func=isMSg)
 def reply(message):
     words = message.text.split()
 
-    if words[0].lower() in ["who" , "what" ]:
+    if words[0].lower() in whoAreYou :
         return bot.reply_to(message,"i am just a simple bot say help to see me")
     if words[0].lower() in hi :
         return bot.reply_to(message,"hey how is going!")
@@ -85,6 +91,7 @@ def reply(message):
         return bot.reply_to(message,s1),bot.reply_to(message,"mention the subject to see their resources!")
     if words[0].lower() == "s1" :
         return bot.reply_to(message,"mention the subject to see their resources !")
+
     if words[0].lower() in inters :
         return bot.reply_to(message,interview1),bot.reply_to(message,interview2),bot.reply_to(message,interview3),bot.reply_to(message,interview4),bot.reply_to(message,interview5),bot.reply_to(message,interview6),bot.reply_to(message,interview7),bot.reply_to(message,interview8),bot.reply_to(message,interview9), bot.reply_to(message,"Interviews : https://www.udrop.com/7Kx4/ML.rar")
     if words[0].lower() == "algorithms":
@@ -109,24 +116,71 @@ def reply(message):
         return bot.reply_to(message,"Entrepreneurship & Economics : https://www.udrop.com/7Kx1/entreprenariat.rar")
     if words[0].lower() == "arabic":
         return bot.reply_to(message,"Arabic : NULL")
+
+
     if words[0].lower() in ecole :
         return bot.reply_to(message,kindy)
     if words[0].lower() in coor :
         return bot.reply_to(message,coordinator)
     if words[0].lower() in creators :
         return bot.reply_to(message,creator)
+
     if words[0].lower() in cvs:
         return bot.reply_to(message,cv_menu),bot.reply_to(message,me)
+
     if words[0].lower() in ["def","definition"] :
         return bot.reply_to(message,w_cv)
+
     if words[0].lower() in ["work","how","works"]:
         return bot.reply_to(message,cv_w)
+
     if words[0].lower() in ["examples","example","ex"]:
         return bot.reply_to(message,exmp)
+
     if words[0].lower() in ["cv2","opencv","lib"]:
         return bot.reply_to(message,ocv)
 
+
+    if words[0].lower() in ["say","قل","dire"] :
+
+        if words[0].lower() in ["say","dire"] :
+            if words[-1].lower() in ["ar","arabic","arabia","arabie","العربية","fr","frensh","francais","français","en","english","anglais","eng"]:
+                text = words[1:-2]
+            else:
+                text = words[1:]
+            # initialize an empty string
+            txt = ""
+            # traverse in the string
+            for ele in text:
+                txt += ele
+                txt += " "
+        if words[0].lower() == "قل" :
+            text = words[1:-1]
+            # initialize an empty string
+            txt = ""
+            # traverse in the string
+            for ele in text:
+                txt += ele
+                txt += " "
+
+        if words[-1].lower() in ["en","english","anglais","eng"]:
+            lng = "en"
+        elif words[-1].lower() in ["fr","frensh","francais","français"]:
+            lng = "fr"
+        elif words[-1].lower() in ["ar","arabic","arabia","arabie","العربية"]:
+            lng = "ar"
+        else :
+            lng = "ar"
+
+        spesh = gTTS(text = txt, lang = lng)
+        spesh.save("audio.mp3")
+
+        return bot.send_audio(message.chat.id, audio=open('audio.mp3', 'rb')),os.remove('audio.mp3')
+
+
     else:
         return bot.reply_to(message,'i do not understand !\nplease say (help) to see the menu.')
+
+
 
 bot.infinity_polling(allowed_updates=util.update_types)
