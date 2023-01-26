@@ -1,0 +1,7 @@
+opencv-python==4.0.0.21
+mediapipe==0.8.3
+numpy==1.19.3
+pytelegrambotapi==4.9.0
+python-decouple==3.7
+
+#python 3.6
