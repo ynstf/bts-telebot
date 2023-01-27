@@ -1,20 +1,14 @@
-###requirements
-#python 3.6
-#cv2 4.0.0.21
-#mediapipe 0.8.3
-#numpy 1.19.3
-#pytelegrambotapi 4.9.0
-#python-decouple 3.7
-
 import telebot
 from telebot import types,util
-from msgs import interview1,interview2,interview3,interview4,interview5,interview6,interview7,interview8,interview9,hlp,hi,info,infos,s1,ecole,kindy,subjects,coor,coordinator,creator,creators,inters,me, ocv, exmp, cv_w, w_cv, cvs,cv_menu
+from msgs import *
 from decouple import config
 from gtts import gTTS
 import os
 import cv2
 import HandTrackingModule as htm
-
+import easyocr
+import warnings
+warnings.filterwarnings("ignore")
 
 BOT_TOKEN = config('BOT_TOKEN')
 bot= telebot.TeleBot(BOT_TOKEN)
@@ -27,11 +21,11 @@ text_messages={
     "saying goodbye":
                 u"{name} lift us 🥺"
 }
-
+##############################################################################################################################
 @bot.message_handler(commands=["start","help"])
 def startBot(message):
     bot.send_message(message.chat.id,text_messages["welcome"])
-
+##############################################################################################################################
 # saying Welcome to joined members
 # saying goodbye to left members
 @bot.chat_member_handler()
@@ -41,43 +35,60 @@ def handleUserUpdates(message:types.ChatMemberUpdated):
         bot.send_message(message.chat.id,text_messages["welcomeNewMember"].format(name=newResponse.user.first_name))
     if newResponse.status == "left":
         bot.send_message(message.chat.id,text_messages["saying goodbye"].format(name=newResponse.user.first_name))
-
+##############################################################################################################################
 
 # answering every message not just commands
 def isMSg(message):
     return True
-
+##############################################################################################################################
 
 @bot.message_handler(content_types=['photo'])
 def photo(message):
+    #get the image
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
+    #download the image
     downloaded_file = bot.download_file(file_info.file_path)
     with open("image.jpg", 'wb') as new_file:
         new_file.write(downloaded_file)
-
+    new_file.close()
+    #read the image by cv2
     img = cv2.imread("image.jpg")
-    #print(img)
+    #detect hands, draw hands and send new image
     detector = htm.handDetector(maxHands=6, detectionCon=0.4)
-
-    img = detector.findHands(img)
-    #lmList,bbox = detector.findPosition(img)
-
-    cv2.imwrite("image.jpg",img)
-    img = open("image.jpg", "rb")
-    bot.send_photo(message.chat.id, img)
-    img.close()
+    hands,img = detector.findHands(img)
+    if len(hands)>0:
+        cv2.imwrite("image.jpg",img)
+        with open("image.jpg", "rb") as pic:
+            bot.send_photo(message.chat.id, pic)
+        pic.close()
+    #delet the images
     os.remove('image.jpg')
-
-
-
-whoAreYou = ["who" , "what" ]
+    
+    #read the content of image
+    reader = easyocr.Reader(['en'],gpu=True)
+    res = reader.readtext(img)
+    #restruct the text
+    text = ""
+    for i in range(len(res)):
+        text+=res[i][1]
+        text+=" "
+    #send the text and the audio if it possible
+    try:
+        spesh = gTTS(text = text, lang = "en")
+        spesh.save("audio.mp3")
+        bot.reply_to(message,text)
+        return bot.send_audio(message.chat.id, audio=open('audio.mp3', 'rb')),os.remove('audio.mp3')
+    #send "no text" if it not possible
+    except :
+        return bot.reply_to(message,"no text")
+##############################################################################################################################
 
 @bot.message_handler(func=isMSg)
 def reply(message):
     words = message.text.split()
 
-    if words[0].lower() in whoAreYou :
+    if words[0].lower() in ["who" , "what" ] :
         return bot.reply_to(message,"i am just a simple bot say help to see me")
     if words[0].lower() in hi :
         return bot.reply_to(message,"hey how is going!")
@@ -184,7 +195,6 @@ def reply(message):
 
     else:
         return bot.reply_to(message,'i do not understand !\nplease say (help) to see the menu.')
-
-
+##############################################################################################################################
 
 bot.infinity_polling(allowed_updates=util.update_types)
